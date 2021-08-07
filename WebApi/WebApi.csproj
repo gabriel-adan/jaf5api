@@ -81,4 +81,6 @@
     </Reference>
   </ItemGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="https://appsemble.app/api.json" /></VisualStudio></ProjectExtensions>
+
 </Project>

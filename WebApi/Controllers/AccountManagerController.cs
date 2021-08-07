@@ -37,7 +37,7 @@ namespace WebApi.Controllers
         {
             try
             {
-                string baseAuthUrl = Configuration.GetSection("Authority").Value;
+                string baseAuthUrl = Configuration.GetSection("AuthorityUrl").Value;
                 string applicationName = Configuration.GetSection("AppConfig:Name").Value;
                 string domainName = Configuration.GetSection("Audience").Value;
                 string authField = Configuration.GetSection("AuthenticationField").Value;
