@@ -15,5 +15,7 @@ namespace Domain.RepositoryInterfaces
         IList<Turn> ReserveList(DateTime date, int hourId, int campId);
 
         IList<Turn> RequestList(DateTime date, int hourId, int campId);
+
+        IList<Turn> PublicIncompletedRequestList(int campId, int perfilId, DateTime dateTime);
     }
 }

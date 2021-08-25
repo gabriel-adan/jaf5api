@@ -14,5 +14,6 @@ namespace Domain
 
         public virtual IList<Hour> Hours { get; set; }
         public virtual IList<Field> Fields { get; set; }
+        public virtual IList<CampImage> Images { get; set; }
     }
 }

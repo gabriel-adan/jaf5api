@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Domain;
 using Domain.RepositoryInterfaces;
 using NHibernate;
@@ -33,7 +34,9 @@ namespace Infrastructure.Repositories
         {
             try
             {
-                var query = Session.CreateSQLQuery(string.Format("CALL SP_TURNS_IN_BUFFER_ZONE({0}, {1}, {2}, '{3}');", longitude, latitude, radius, dateTime.ToString("yyyy-MM-dd HH:mm:ss")));
+                NumberFormatInfo numberFormatInfo = new NumberFormatInfo();
+                numberFormatInfo.NumberDecimalSeparator = ".";
+                var query = Session.CreateSQLQuery(string.Format("CALL SP_TURNS_IN_BUFFER_ZONE({0}, {1}, {2}, '{3}');", longitude.ToString(numberFormatInfo), latitude.ToString(numberFormatInfo), radius.ToString(numberFormatInfo), dateTime.ToString("yyyy-MM-dd HH:mm:ss")));
                 query.AddEntity(typeof(Turn));
                 return query.List<Turn>();
             }
@@ -92,6 +95,20 @@ namespace Infrastructure.Repositories
                     .Add(Restrictions.Eq("t.State", EState.REQUESTED))
                     .Add(Restrictions.Eq("c.Id", campId))
                     .List<Turn>();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public IList<Turn> PublicIncompletedRequestList(int campId, int perfilId, DateTime dateTime)
+        {
+            try
+            {
+                var query = Session.CreateSQLQuery(string.Format("CALL SP_PUBLIC_INCOMPLETED_TEAMS_IN_CAMP({0}, {1}, '{2}');", campId, perfilId, dateTime.ToString("yyyy-MM-dd HH:mm:ss")));
+                query.AddEntity(typeof(Turn));
+                return query.List<Turn>();
             }
             catch
             {

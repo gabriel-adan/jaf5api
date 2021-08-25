@@ -10,5 +10,10 @@ namespace Domain
 
         public virtual Perfil Perfil { get; set; }
         public virtual IList<Player> Players { get; set; }
+
+        public Team()
+        {
+            Players = new List<Player>();
+        }
     }
 }

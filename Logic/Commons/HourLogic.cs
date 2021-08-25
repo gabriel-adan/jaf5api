@@ -23,7 +23,7 @@ namespace Logic.Commons
         {
             try
             {
-                Helper.TryParseEnum<DayOfWeek>(dayOfWeek, "Día de la semana inválido");
+                Helper.TryParseEnum<DayOfWeek>(dayOfWeek - 1, "Día de la semana inválido");
                 Camp camp = campRepository.Get(campId);
                 Helper.ThrowIfNull(camp, "Datos de cancha inválida.");
                 Helper.ThrowIf(!camp.IsEnabled, "Cancha no disponible por el momento.");

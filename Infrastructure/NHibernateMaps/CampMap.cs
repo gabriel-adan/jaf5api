@@ -8,6 +8,8 @@ namespace Infrastructure.NHibernateMaps
     {
         public void Override(AutoMapping<Camp> mapping)
         {
+            //mapping.Map(x => x.Longitude).ReadOnly();
+            //mapping.Map(x => x.Latitude).ReadOnly();
             mapping.IgnoreProperty(x => x.Longitude);
             mapping.IgnoreProperty(x => x.Latitude);
             //mapping.Map(x => x.Longitude).Not.Insert().Not.Update();

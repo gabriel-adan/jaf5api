@@ -22,5 +22,7 @@ namespace Logic.Contracts
         void Confirm(int id);
 
         IList<TurnDto> GetRequestList(DateTime date, int hourId, int campId);
+
+        IList<TurnTeamDto> GetPublicIncompletedReserveList(int campId, string email);
     }
 }

@@ -6,6 +6,8 @@ namespace Logic.Contracts
     {
         Perfil PerfilExists(string email);
 
+        Perfil CreatePerfil(string firstName, string lastName, string email);
+
         Customer CustomerExists(string email);
 
         Customer CreateCustomer(string firstName, string lastName, string email);

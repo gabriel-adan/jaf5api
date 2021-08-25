@@ -14,12 +14,14 @@ namespace WebApi.Controllers
     {
         private readonly ICampLogic campLogic;
         private readonly IList<string> AbcFieldNames;
+        private readonly string imagesPath;
 
         public CampManagerController(ILogger<ApiBaseController> logger, ICampLogic campLogic, IConfiguration configuration) :base(logger)
         {
             this.campLogic = campLogic;
             string fieldNames = configuration.GetValue<string>("AbcFieldNames");
             AbcFieldNames = fieldNames.Split(',');
+            imagesPath = configuration.GetValue<string>("CampImagesRoute");
         }
 
         [HttpPost("Create")]
@@ -29,7 +31,7 @@ namespace WebApi.Controllers
             try
             {
                 string email = User.Identity.Name;
-                CampDto createdCampDto = campLogic.Create(email, form.Name, form.Street, form.Number, form.Longitude, form.Latitude, AbcFieldNames, form.FieldCount);
+                CampDto createdCampDto = campLogic.Create(email, form.Name, form.Street, form.Number, form.Longitude, form.Latitude, AbcFieldNames, form.FieldCount, imagesPath);
                 return Ok(createdCampDto);
             }
             catch (ArgumentException ex)
@@ -89,8 +91,9 @@ namespace WebApi.Controllers
         {
             try
             {
+                string baseUrl = string.Format("{0}://{1}{2}", Request.Scheme, Request.Host.Value, imagesPath);
                 string userName = User.Identity.Name;
-                var camps = campLogic.List(userName);
+                var camps = campLogic.List(userName, baseUrl);
                 return Ok(camps);
             }
             catch (Exception ex)

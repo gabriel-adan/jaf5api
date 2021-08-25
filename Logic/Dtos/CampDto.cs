@@ -1,4 +1,6 @@
-﻿namespace Logic.Dtos
+﻿using System.Collections.Generic;
+
+namespace Logic.Dtos
 {
     public class CampDto : EntityDto
     {
@@ -17,6 +19,9 @@
             IsEnabled = isEnabled;
             Longitude = lng;
             Latitude = lat;
+            Images = new List<CampImageDto>();
         }
+
+        public IList<CampImageDto> Images { get; }
     }
 }

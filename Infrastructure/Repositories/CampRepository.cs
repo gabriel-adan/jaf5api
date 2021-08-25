@@ -2,6 +2,7 @@
 using Domain.RepositoryInterfaces;
 using NHibernate;
 using SharpArch.Domain.PersistenceSupport;
+using System.Globalization;
 using System.Collections.Generic;
 
 namespace Infrastructure.Repositories
@@ -67,7 +68,9 @@ namespace Infrastructure.Repositories
         {
             try
             {
-                var query = Session.CreateSQLQuery(string.Format("CALL SP_CAMPS_IN_BUFFER_ZONE({0}, {1}, {2});", longitude, latitude, radius));
+                NumberFormatInfo numberFormatInfo = new NumberFormatInfo();
+                numberFormatInfo.NumberDecimalSeparator = ".";
+                var query = Session.CreateSQLQuery(string.Format("CALL SP_CAMPS_IN_BUFFER_ZONE({0}, {1}, {2});", longitude.ToString(numberFormatInfo), latitude.ToString(numberFormatInfo), radius.ToString(numberFormatInfo)));
                 query.AddEntity(typeof(Camp));
                 return query.List<Camp>();
             }

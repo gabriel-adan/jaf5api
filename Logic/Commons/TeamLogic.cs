@@ -71,6 +71,7 @@ namespace Logic.Commons
         {
             try
             {
+                playerRepository.TransactionManager.BeginTransaction();
                 TurnResultDto turnResultDto = null;
                 Turn turn = turnRepository.Get(turnId);
                 Helper.ThrowIfNull(turn, "Turno inválido.");
@@ -81,7 +82,6 @@ namespace Logic.Commons
                 Helper.ThrowIfNull(player, "No existe la solicitud de unión.");
 
                 Perfil perfil = team.Perfil;
-                playerRepository.TransactionManager.BeginTransaction();
                 DateTime date = turn.Date;
                 TimeSpan time = turn.Hour.Time;
                 DateTime turnDateTime = new DateTime(date.Year, date.Month, date.Day, time.Hours, time.Minutes, time.Seconds);

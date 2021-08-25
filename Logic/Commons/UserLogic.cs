@@ -30,6 +30,23 @@ namespace Logic.Commons
             }
         }
 
+        public Perfil CreatePerfil(string firstName, string lastName, string email)
+        {
+            try
+            {
+                Perfil perfil = perfilRepository.Exists(email);
+                Helper.ThrowIfExists(perfil, "Ya existe una cuenta con este correo electrónico");
+                perfil = new Perfil();
+                perfil.Name = string.Format("{0} {1}", firstName, lastName);
+                perfil.Email = email;
+                return perfilRepository.Save(perfil);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public Customer CustomerExists(string email)
         {
             try

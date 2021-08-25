@@ -5,6 +5,7 @@ using Domain.RepositoryInterfaces;
 using Logic.Dtos;
 using Logic.Contracts;
 using SharpArch.Domain.PersistenceSupport;
+using System.IO;
 
 namespace Logic.Commons
 {
@@ -27,10 +28,11 @@ namespace Logic.Commons
             this.userCampRepository = userCampRepository;
         }
 
-        public CampDto Create(string email, string name, string street, string number, double longitude, double latitude, IList<string> fieldNames, int fieldCount)
+        public CampDto Create(string email, string name, string street, string number, double longitude, double latitude, IList<string> fieldNames, int fieldCount, string imagesPath)
         {
             try
             {
+                campRepository.TransactionManager.BeginTransaction();
                 Customer customer = customerRepository.Exists(email);
                 Helper.ThrowIfNull(customer, "Cliente no registrado");
                 Helper.ThrowIfIsNullOrEmpty(name, "Debe ingresar un nombre para la cancha");
@@ -41,8 +43,6 @@ namespace Logic.Commons
                 Helper.ThrowIf(fieldCount > countMax, "Por el momento solo es posible registrar hasta [" + countMax + "] canchas.");
 
                 fieldNames = fieldNames.Take(fieldCount).ToList();
-
-                campRepository.TransactionManager.BeginTransaction();
 
                 Camp camp = new Camp();
                 camp.Name = name;
@@ -126,18 +126,12 @@ namespace Logic.Commons
             }
         }
 
-        public IList<CampDto> ListByBufferZone(double longitude, double latitude, float radius)
+        public IList<CampDto> ListByBufferZone(double longitude, double latitude, float radius, string imagesPath)
         {
             try
             {
-                IList<CampDto> campDtos = new List<CampDto>();
                 var camps = campRepository.ListByBufferZone(longitude, latitude, radius);
-                foreach (Camp camp in camps)
-                {
-                    CampDto campDto = new CampDto(camp.Id, camp.Name, camp.Street, camp.Number, camp.IsEnabled, camp.Longitude, camp.Latitude);
-                    campDtos.Add(campDto);
-                }
-                return campDtos;
+                return BuildCampList(camps, imagesPath);
             }
             catch
             {
@@ -145,23 +139,40 @@ namespace Logic.Commons
             }
         }
 
-        public IList<CampDto> List(string userName)
+        public IList<CampDto> List(string userName, string imagesPath)
         {
             try
             {
-                IList<CampDto> campDtos = new List<CampDto>();
                 var camps = campRepository.List(userName);
-                foreach (Camp camp in camps)
-                {
-                    CampDto campDto = new CampDto(camp.Id, camp.Name, camp.Street, camp.Number, camp.IsEnabled, camp.Longitude, camp.Latitude);
-                    campDtos.Add(campDto);
-                }
-                return campDtos;
+                return BuildCampList(camps, imagesPath);
             }
             catch
             {
                 throw;
             }
+        }
+
+        private IList<CampDto> BuildCampList(IList<Camp> camps, string imagesPath)
+        {
+            IList<CampDto> campDtos = new List<CampDto>();
+            foreach (Camp camp in camps)
+            {
+                CampDto campDto = BuildCamp(camp, imagesPath);
+                campDtos.Add(campDto);
+            }
+            return campDtos;
+        }
+
+        private CampDto BuildCamp(Camp camp, string imagesPath)
+        {
+            CampDto campDto = new CampDto(camp.Id, camp.Name, camp.Street, camp.Number, camp.IsEnabled, camp.Longitude, camp.Latitude);
+            foreach (CampImage campImage in camp.Images)
+            {
+                string fileUrl = string.Format("{0}/{1}", imagesPath, campImage.Name);
+                CampImageDto campImageDto = new CampImageDto(campImage.Id, fileUrl);
+                campDto.Images.Add(campImageDto);
+            }
+            return campDto;
         }
     }
 }

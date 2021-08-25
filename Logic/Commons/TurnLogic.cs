@@ -14,12 +14,12 @@ namespace Logic.Commons
     {
         private readonly IRepository<Hour> hourRepository;
         private readonly IRepository<Team> teamRepository;
-        private readonly IRepository<Perfil> perfilRepository;
+        private readonly IPerfilRepository perfilRepository;
         private readonly IFieldRepository fieldRepository;
         private readonly ITurnRepository turnRepository;
         private readonly IRepository<Player> playerRepository;
 
-        public TurnLogic(IRepository<Hour> hourRepository, IRepository<Team> teamRepository, IRepository<Perfil> perfilRepository, IFieldRepository fieldRepository, ITurnRepository turnRepository, IRepository<Player> playerRepository)
+        public TurnLogic(IRepository<Hour> hourRepository, IRepository<Team> teamRepository, IPerfilRepository perfilRepository, IFieldRepository fieldRepository, ITurnRepository turnRepository, IRepository<Player> playerRepository)
         {
             this.hourRepository = hourRepository;
             this.teamRepository = teamRepository;
@@ -33,6 +33,7 @@ namespace Logic.Commons
         {
             try
             {
+                turnRepository.TransactionManager.BeginTransaction();
                 DateTime now = Helper.GetDateTimeZone();
                 Helper.ThrowIf(date < now, "No se puede solicitar un turno para una fecha pasada.");
                 Hour hour = hourRepository.Get(hourId);
@@ -45,8 +46,6 @@ namespace Logic.Commons
                 Helper.ThrowIf(team.Players.Count < amoutPlayers, string.Format("El grupo {0} no tiene la cantidad de participantes suficientes para invitar, debe tener al menos {1} participantes.", team.Name, amoutPlayers));
                 Field field = fieldRepository.FindAvailable(date, hour);
                 Helper.ThrowIfNull(field, "No hay canchas disponibles.");
-
-                turnRepository.TransactionManager.BeginTransaction();
 
                 Turn turn = new Turn();
                 turn.Date = date;
@@ -92,14 +91,13 @@ namespace Logic.Commons
         {
             try
             {
+                turnRepository.TransactionManager.BeginTransaction();
                 Helper.ThrowIfIsNullOrEmpty(name, "Debe ingresar el nombre de quien reserva.");
                 Helper.ThrowIf(date < Helper.GetDateTimeZone(), "No se puede solicitar un turno para una fecha pasada.");
                 Hour hour = hourRepository.Get(hourId);
                 Helper.ThrowIfNull(hour, "Horario inválido.");
                 Field field = fieldRepository.FindAvailableReserve(date, hour);
                 Helper.ThrowIfNull(field, "No hay canchas disponibles.");
-
-                turnRepository.TransactionManager.BeginTransaction();
 
                 Turn turn = new Turn();
                 turn.Date = date;
@@ -139,6 +137,7 @@ namespace Logic.Commons
         {
             try
             {
+                teamRepository.TransactionManager.BeginTransaction();
                 Helper.ThrowIfIsNullOrEmpty(name, "Debe ingresar un nombre para el grupo.");
                 Perfil perfil = perfilRepository.Get(perfilId);
                 Helper.ThrowIfNull(perfil, "Perfil inválido.");
@@ -147,14 +146,10 @@ namespace Logic.Commons
                 Field field = fieldRepository.FindAvailable(date, hour);
                 Helper.ThrowIfNull(field, "No hay canchas disponibles.");
 
-                teamRepository.TransactionManager.BeginTransaction();
-
                 Team team = new Team();
                 team.IsPrivate = isPrivate;
                 team.Name = name;
                 team.Perfil = perfil;
-
-                teamRepository.Save(team);
 
                 DateTime now = Helper.GetDateTimeZone();
                 Player player = new Player();
@@ -164,7 +159,7 @@ namespace Logic.Commons
                 player.ConfirmDate = now;
                 team.Players.Add(player);
 
-                teamRepository.SaveOrUpdate(team);
+                teamRepository.Save(team);
 
                 Turn turn = new Turn();
                 turn.Date = date;
@@ -254,13 +249,13 @@ namespace Logic.Commons
         {
             try
             {
+                turnRepository.TransactionManager.BeginTransaction();
                 Turn turn = turnRepository.Get(id);
                 Helper.ThrowIfNull(turn, "El turno no existe");
                 DateTime now = Helper.GetDateTimeZone();
                 //Helper.ThrowIf(turn.Date < now, "El turno está vencido");
                 if (!turn.Success)
                 {
-                    turnRepository.TransactionManager.BeginTransaction();
                     turn.Success = true;
                     turnRepository.SaveOrUpdate(turn);
                     turnRepository.TransactionManager.CommitTransaction();
@@ -268,6 +263,7 @@ namespace Logic.Commons
             }
             catch
             {
+                turnRepository.TransactionManager.RollbackTransaction();
                 throw;
             }
         }
@@ -287,6 +283,34 @@ namespace Logic.Commons
                     results.Add(turnDto);
                 }
                 return results;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public IList<TurnTeamDto> GetPublicIncompletedReserveList(int campId, string email)
+        {
+            try
+            {
+                Perfil perfil = perfilRepository.Exists(email);
+                Helper.ThrowIfNull(perfil, "Perfil inválido");
+                IList<TurnTeamDto> turnTeams = new List<TurnTeamDto>();
+                DateTime dateTime = Helper.GetDateTimeZone();
+                dateTime = dateTime.AddHours((int)ETurnsExpiration.HOURS);
+                var turns = turnRepository.PublicIncompletedRequestList(campId, perfil.Id, dateTime);
+                foreach (Turn turn in turns)
+                {
+                    Hour hour = turn.Hour;
+                    Camp camp = hour.Camp;
+                    Team team = turn.Team;
+                    DateTime timestamp = new DateTime(turn.Date.Year, turn.Date.Month, turn.Date.Day, hour.Time.Hours, hour.Time.Minutes, hour.Time.Seconds);
+                    int playersAmount = team.Players.Where(p => p.ConfirmDate.HasValue).Count();
+                    TurnTeamDto turnTeamDto = new TurnTeamDto(turn.Id, team.Name, camp.Name, camp.Street + " " + camp.Number, timestamp, playersAmount);
+                    turnTeams.Add(turnTeamDto);
+                }
+                return turnTeams;
             }
             catch
             {

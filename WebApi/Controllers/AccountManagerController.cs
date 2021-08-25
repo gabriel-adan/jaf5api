@@ -80,8 +80,9 @@ namespace WebApi.Controllers
             {
                 Helper.ThrowIfIsNullOrEmpty(playerSignInForm.Email, "Debe ingresar un correo electrónico");
 
-                string baseAuthUrl = Configuration.GetSection("Authority").Value;
+                string baseAuthUrl = Configuration.GetSection("AuthorityUrl").Value;
                 string applicationName = Configuration.GetSection("AppConfig:Name").Value;
+                string authField = Configuration.GetSection("AuthenticationField").Value;
                 string authUri = Configuration.GetSection("AuthUri").Value;
                 
                 int verifyCode = RandomCodeGenerator.Next(MinValueVerifyCode, MaxValueVerifyCode);
@@ -98,7 +99,7 @@ namespace WebApi.Controllers
                         VerifyCode = verifyCode,
                         Roles = new List<string>() { "Player" },
                         ApplicationName = applicationName,
-                        AuthenticationField = 0
+                        AuthenticationField = authField
                     };
 
                     string json = JsonConvert.SerializeObject(obj);
@@ -106,7 +107,10 @@ namespace WebApi.Controllers
                     HttpResponseMessage result = await httpClient.PostAsync(authUri + "/SignIn", content);
                     string message = await result.Content.ReadAsStringAsync();
                     if (result.StatusCode == HttpStatusCode.OK)
+                    {
+                        Perfil perfil = userLogic.CreatePerfil(playerSignInForm.FirstName, playerSignInForm.LastName, playerSignInForm.Email);
                         return Ok(message);
+                    }
                     if (string.IsNullOrEmpty(message) && result.StatusCode == HttpStatusCode.NotFound)
                         throw new Exception(AUTH_SERVICE_NOT_AVAILABLE);
                     return NotFound(new { Message = message });
@@ -131,9 +135,10 @@ namespace WebApi.Controllers
                 Helper.ThrowIfIsNullOrEmpty(form.UserName, "Usuario inválido");
                 Helper.ThrowIfIsNullOrEmpty(form.VerifyCode, "Código de verificación inválido");
 
-                string baseAuthUrl = Configuration.GetSection("Authority").Value;
+                string baseAuthUrl = Configuration.GetSection("AuthorityUrl").Value;
                 string applicationName = Configuration.GetSection("AppConfig:Name").Value;
                 string domainName = Configuration.GetSection("Audience").Value;
+                string authField = Configuration.GetSection("AuthenticationField").Value;
                 string authUri = Configuration.GetSection("AuthUri").Value;
 
                 using (HttpClient httpClient = new HttpClient())
@@ -145,7 +150,7 @@ namespace WebApi.Controllers
                         VerifyCode = form.VerifyCode,
                         ApplicationName = applicationName,
                         DomainName = domainName,
-                        AuthenticationField = 0
+                        AuthenticationField = authField
                     };
 
                     string json = JsonConvert.SerializeObject(obj);
@@ -183,8 +188,9 @@ namespace WebApi.Controllers
             {
                 Helper.ThrowIfIsNullOrEmpty(form.Email, "Debe ingresar un correo electrónico");
 
-                string baseAuthUrl = Configuration.GetSection("Authority").Value;
+                string baseAuthUrl = Configuration.GetSection("AuthorityUrl").Value;
                 string applicationName = Configuration.GetSection("AppConfig:Name").Value;
+                string authField = Configuration.GetSection("AuthenticationField").Value;
                 string authUri = Configuration.GetSection("AuthUri").Value;
 
                 int verifyCode = RandomCodeGenerator.Next(MinValueVerifyCode, MaxValueVerifyCode);
@@ -202,7 +208,7 @@ namespace WebApi.Controllers
                         VerifyCode = verifyCode,
                         Roles = new List<string>() { "Owner" },
                         ApplicationName = applicationName,
-                        AuthenticationField = 0
+                        AuthenticationField = authField
                     };
 
                     string json = JsonConvert.SerializeObject(obj);
@@ -242,9 +248,10 @@ namespace WebApi.Controllers
                 Helper.ThrowIfIsNullOrEmpty(form.UserName, "Usuario inválido");
                 Helper.ThrowIfIsNullOrEmpty(form.VerifyCode, "Código de verificación inválido");
 
-                string baseAuthUrl = Configuration.GetSection("Authority").Value;
+                string baseAuthUrl = Configuration.GetSection("AuthorityUrl").Value;
                 string applicationName = Configuration.GetSection("AppConfig:Name").Value;
                 string domainName = Configuration.GetSection("Audience").Value;
+                string authField = Configuration.GetSection("AuthenticationField").Value;
                 string authUri = Configuration.GetSection("AuthUri").Value;
 
                 using (HttpClient httpClient = new HttpClient())
@@ -256,7 +263,7 @@ namespace WebApi.Controllers
                         VerifyCode = form.VerifyCode,
                         ApplicationName = applicationName,
                         DomainName = domainName,
-                        AuthenticationField = 0
+                        AuthenticationField = authField
                     };
 
                     string json = JsonConvert.SerializeObject(obj);

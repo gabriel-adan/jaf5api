@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Xml;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using WebApi.Extentions;
@@ -118,6 +120,14 @@ namespace WebApi
             app.UseCors("corsAllowAllPolicy");
             //app.UseHttpsRedirection();
             app.UseAuthentication();
+            string campImagesFolderName = Configuration.GetSection("CampImagesFolderName").Value;
+            string campImagesRoute = Configuration.GetSection("CampImagesRoute").Value;
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                Path.Combine(env.ContentRootPath, campImagesFolderName)),
+                RequestPath = campImagesRoute
+            });
             app.UseMvc();
         }
 

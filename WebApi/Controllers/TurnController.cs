@@ -112,6 +112,23 @@ namespace WebApi.Controllers
             }
         }
 
+        [HttpGet("GetIncompletedTeams/{campId}")]
+        [Authorize(Roles = "Player")]
+        public IActionResult GetIncompletedTeams(int campId)
+        {
+            try
+            {
+                string email = User.Identity.Name;
+                var turns = turnLogic.GetPublicIncompletedReserveList(campId, email);
+                return Ok(turns);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "GetIncompletedTeams method");
+                return NotFound(new { Message = "Ocurrió un error." });
+            }
+        }
+
         [HttpGet("GetList/{id}/{fromDate}/{toDate}")]
         [Authorize(Roles = "Owner, Employee")]
         public IActionResult GetList(int id, DateTime fromDate, DateTime toDate)
