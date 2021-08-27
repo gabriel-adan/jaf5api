@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using SharpArch.Domain.PersistenceSupport;
 using Domain;
+using Domain.RepositoryInterfaces;
 using Logic.Dtos;
 using Logic.Contracts;
 using Logic.BusinessRules;
@@ -11,12 +12,12 @@ namespace Logic.Commons
 {
     public class TeamLogic : ITeamLogic
     {
-        private readonly IRepository<Team> teamRepository;
+        private readonly ITeamRepository teamRepository;
         private readonly IRepository<Perfil> perfilRepository;
         private readonly IRepository<Player> playerRepository;
         private readonly IRepository<Turn> turnRepository;
 
-        public TeamLogic(IRepository<Team> teamRepository, IRepository<Perfil> perfilRepository, IRepository<Player> playerRepository, IRepository<Turn> turnRepository)
+        public TeamLogic(ITeamRepository teamRepository, IRepository<Perfil> perfilRepository, IRepository<Player> playerRepository, IRepository<Turn> turnRepository)
         {
             this.teamRepository = teamRepository;
             this.perfilRepository = perfilRepository;
@@ -142,6 +143,43 @@ namespace Logic.Commons
                 playerRepository.TransactionManager.RollbackTransaction();
                 throw;
             }
+        }
+
+        public IList<TeamResumeDto> GetList(string email)
+        {
+            try
+            {
+                var teams = teamRepository.GetList(email);
+                return CreateList(teams);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public IList<TeamResumeDto> GetJoinedList(string email)
+        {
+            try
+            {
+                var teams = teamRepository.GetJoinedList(email);
+                return CreateList(teams);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        private IList<TeamResumeDto> CreateList(IList<Team> teams)
+        {
+            IList<TeamResumeDto> teamResumeDtos = new List<TeamResumeDto>();
+            foreach (Team team in teams)
+            {
+                TeamResumeDto teamResumeDto = new TeamResumeDto(team.Id, team.Name, team.IsPrivate, team.CreatedDate, team.Players.Count);
+                teamResumeDtos.Add(teamResumeDto);
+            }
+            return teamResumeDtos;
         }
     }
 }

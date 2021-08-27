@@ -60,5 +60,39 @@ namespace WebApi.Controllers
                 return NotFound(new { Message = "Ocurrió un error." });
             }
         }
+
+        [HttpGet]
+        //[Authorize(Roles = "Player")]
+        public IActionResult Get()
+        {
+            try
+            {
+                string email = User.Identity.Name;
+                var result = teamLogic.GetJoinedList(email);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Get method");
+                return NotFound(new { Message = "Ocurrió un error." });
+            }
+        }
+
+        [HttpGet("JoinedList")]
+        [Authorize(Roles = "Player")]
+        public IActionResult GetJoined()
+        {
+            try
+            {
+                string email = User.Identity.Name;
+                var result = teamLogic.GetJoinedList(email);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "GetJoined method");
+                return NotFound(new { Message = "Ocurrió un error." });
+            }
+        }
     }
 }

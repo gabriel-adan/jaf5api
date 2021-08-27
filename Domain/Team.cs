@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SharpArch.Domain.DomainModel;
 
 namespace Domain
@@ -7,6 +8,7 @@ namespace Domain
     {
         public virtual string Name { get; set; }
         public virtual bool IsPrivate { get; set; }
+        public virtual DateTime CreatedDate { get; set; }
 
         public virtual Perfil Perfil { get; set; }
         public virtual IList<Player> Players { get; set; }
