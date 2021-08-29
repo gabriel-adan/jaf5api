@@ -1,6 +1,7 @@
 ﻿using Domain;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Automapping.Alterations;
+using NHibernate.Spatial.Type;
 
 namespace Infrastructure.NHibernateMaps
 {
@@ -8,12 +9,7 @@ namespace Infrastructure.NHibernateMaps
     {
         public void Override(AutoMapping<Camp> mapping)
         {
-            //mapping.Map(x => x.Longitude).ReadOnly();
-            //mapping.Map(x => x.Latitude).ReadOnly();
-            mapping.IgnoreProperty(x => x.Longitude);
-            mapping.IgnoreProperty(x => x.Latitude);
-            //mapping.Map(x => x.Longitude).Not.Insert().Not.Update();
-            //mapping.Map(x => x.Latitude).Not.Insert().Not.Update();
+            mapping.Map(x => x.Location).CustomType<GeometryType>();
         }
     }
 }

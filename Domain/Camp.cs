@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SharpArch.Domain.DomainModel;
+using NetTopologySuite.Geometries;
 
 namespace Domain
 {
@@ -9,8 +10,7 @@ namespace Domain
         public virtual string Street { get; set; }
         public virtual string Number { get; set; }
         public virtual bool IsEnabled { get; set; }
-        public virtual double Longitude { get; set; }
-        public virtual double Latitude { get; set; }
+        public virtual Point Location { get; set; }
 
         public virtual IList<Hour> Hours { get; set; }
         public virtual IList<Field> Fields { get; set; }

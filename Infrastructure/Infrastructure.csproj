@@ -6,6 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="NHibernateMaps\NamedQueries.hbm.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="NHibernateMaps\NamedQueries.hbm.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
@@ -22,8 +32,17 @@
     <Reference Include="MySql.Data">
       <HintPath>..\Packages\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="NetTopologySuite">
+      <HintPath>..\Packages\NetTopologySuite.dll</HintPath>
+    </Reference>
     <Reference Include="NHibernate">
       <HintPath>..\Packages\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.Spatial">
+      <HintPath>..\Packages\NHibernate.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.Spatial.MySQL">
+      <HintPath>..\Packages\NHibernate.Spatial.MySQL.dll</HintPath>
     </Reference>
     <Reference Include="Remotion.Linq.EagerFetching">
       <HintPath>..\Packages\Remotion.Linq.EagerFetching.dll</HintPath>

@@ -67,6 +67,9 @@
     <Reference Include="NHibernate">
       <HintPath>..\Packages\NHibernate.dll</HintPath>
     </Reference>
+    <Reference Include="NHibernate.Spatial.MySQL">
+      <HintPath>..\Packages\NHibernate.Spatial.MySQL.dll</HintPath>
+    </Reference>
     <Reference Include="Remotion.Linq.EagerFetching">
       <HintPath>..\Packages\Remotion.Linq.EagerFetching.dll</HintPath>
     </Reference>
@@ -78,6 +81,9 @@
     </Reference>
     <Reference Include="System.Security.Cryptography.ProtectedData">
       <HintPath>..\Packages\System.Security.Cryptography.ProtectedData.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Permissions, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>..\Packages\System.Security.Permissions.dll</HintPath>
     </Reference>
   </ItemGroup>
 

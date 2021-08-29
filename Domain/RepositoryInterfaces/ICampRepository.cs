@@ -5,7 +5,7 @@ namespace Domain.RepositoryInterfaces
 {
     public interface ICampRepository : IRepository<Camp>
     {
-        IList<Camp> ListByBufferZone(double longitude, double latitude, float radius);
+        IList<Camp> ListByBufferZone(double longitude, double latitude, float radius, int spatialReference);
 
         IList<Camp> List(string userName);
     }

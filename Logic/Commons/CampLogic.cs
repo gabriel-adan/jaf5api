@@ -5,7 +5,7 @@ using Domain.RepositoryInterfaces;
 using Logic.Dtos;
 using Logic.Contracts;
 using SharpArch.Domain.PersistenceSupport;
-using System.IO;
+using NetTopologySuite.Geometries;
 
 namespace Logic.Commons
 {
@@ -28,7 +28,7 @@ namespace Logic.Commons
             this.userCampRepository = userCampRepository;
         }
 
-        public CampDto Create(string email, string name, string street, string number, double longitude, double latitude, IList<string> fieldNames, int fieldCount, string imagesPath)
+        public CampDto Create(string email, string name, string street, string number, double longitude, double latitude, IList<string> fieldNames, int fieldCount, string imagesPath, int spatialReference)
         {
             try
             {
@@ -48,8 +48,10 @@ namespace Logic.Commons
                 camp.Name = name;
                 camp.Street = street;
                 camp.Number = number;
-                camp.Longitude = longitude;
-                camp.Latitude = latitude;
+                Coordinate coordinate = new Coordinate(longitude, latitude);
+                Point location = new Point(coordinate);
+                location.SRID = spatialReference;
+                camp.Location = location;
                 camp.IsEnabled = true;
                 camp = campRepository.Save(camp);
 
@@ -82,7 +84,7 @@ namespace Logic.Commons
                 userCampRepository.Save(userCamp);
                 campRepository.TransactionManager.CommitTransaction();
 
-                return new CampDto(camp.Id, camp.Name, camp.Street, camp.Number, camp.IsEnabled, camp.Longitude, camp.Latitude);
+                return new CampDto(camp.Id, camp.Name, camp.Street, camp.Number, camp.IsEnabled, camp.Location.X, camp.Location.Y);
             }
             catch
             {
@@ -126,11 +128,11 @@ namespace Logic.Commons
             }
         }
 
-        public IList<CampDto> ListByBufferZone(double longitude, double latitude, float radius, string imagesPath)
+        public IList<CampDto> ListByBufferZone(double longitude, double latitude, float radius, int srId, string imagesPath)
         {
             try
             {
-                var camps = campRepository.ListByBufferZone(longitude, latitude, radius);
+                var camps = campRepository.ListByBufferZone(longitude, latitude, radius, srId);
                 return BuildCampList(camps, imagesPath);
             }
             catch
@@ -165,7 +167,7 @@ namespace Logic.Commons
 
         private CampDto BuildCamp(Camp camp, string imagesPath)
         {
-            CampDto campDto = new CampDto(camp.Id, camp.Name, camp.Street, camp.Number, camp.IsEnabled, camp.Longitude, camp.Latitude);
+            CampDto campDto = new CampDto(camp.Id, camp.Name, camp.Street, camp.Number, camp.IsEnabled, camp.Location.X, camp.Location.Y);
             foreach (CampImage campImage in camp.Images)
             {
                 string fileUrl = string.Format("{0}/{1}", imagesPath, campImage.Name);

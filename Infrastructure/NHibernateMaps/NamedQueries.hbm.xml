@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="WebApiTest">
+  <sql-query name="GetCampListByEmail">
+    <return class="Domain.Camp, Domain"/>
+    SELECT c.Id, c.Name, c.Street, c.Number, c.IsEnabled, c.Location FROM camp c INNER JOIN account a ON a.Camp_Id = c.Id INNER JOIN usercamp uc ON uc.Account_Id = a.Id INNER JOIN user u ON u.Id = uc.User_Id WHERE uc.IsEnabled AND a.IsEnabled AND u.Email = :email;
+  </sql-query>
+</hibernate-mapping>

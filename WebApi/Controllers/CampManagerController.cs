@@ -15,6 +15,7 @@ namespace WebApi.Controllers
         private readonly ICampLogic campLogic;
         private readonly IList<string> AbcFieldNames;
         private readonly string imagesPath;
+        private readonly int spatialReference;
 
         public CampManagerController(ILogger<ApiBaseController> logger, ICampLogic campLogic, IConfiguration configuration) :base(logger)
         {
@@ -22,6 +23,7 @@ namespace WebApi.Controllers
             string fieldNames = configuration.GetValue<string>("AbcFieldNames");
             AbcFieldNames = fieldNames.Split(',');
             imagesPath = configuration.GetValue<string>("CampImagesRoute");
+            spatialReference = configuration.GetValue<int>("SpatialReference");
         }
 
         [HttpPost("Create")]
@@ -31,7 +33,7 @@ namespace WebApi.Controllers
             try
             {
                 string email = User.Identity.Name;
-                CampDto createdCampDto = campLogic.Create(email, form.Name, form.Street, form.Number, form.Longitude, form.Latitude, AbcFieldNames, form.FieldCount, imagesPath);
+                CampDto createdCampDto = campLogic.Create(email, form.Name, form.Street, form.Number, form.Longitude, form.Latitude, AbcFieldNames, form.FieldCount, imagesPath, spatialReference);
                 return Ok(createdCampDto);
             }
             catch (ArgumentException ex)

@@ -9,6 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="NetTopologySuite">
+      <HintPath>..\Packages\NetTopologySuite.dll</HintPath>
+    </Reference>
     <Reference Include="SharpArch.Domain">
       <HintPath>..\Packages\SharpArch.Domain.dll</HintPath>
     </Reference>

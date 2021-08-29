@@ -1,4 +1,7 @@
-﻿using FluentNHibernate.Cfg;
+﻿using System.IO;
+using NHibernate.Cfg;
+using NHibernate.Spatial.Dialect;
+using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Automapping;
 using SharpArch.Domain.DomainModel;
@@ -17,12 +20,14 @@ namespace WebApi.Extentions
         {
             try
             {
+                FileInfo fileInfo = new FileInfo(".." + Path.DirectorySeparatorChar + "Infrastructure" + Path.DirectorySeparatorChar + "NHibernateMaps" + Path.DirectorySeparatorChar + "NamedQueries.hbm.xml");
+                Configuration cfg = new Configuration().AddFile(fileInfo);
                 var autoPersistenceModel = AutoMap.AssemblyOf<Item>(new AutomappingConfiguration()).UseOverridesFromAssemblyOf<AutomappingConfiguration>();
                 autoPersistenceModel.Conventions.AddFromAssemblyOf<LowercaseTableNameConvention>();
                 autoPersistenceModel.IgnoreBase<Entity>();
                 autoPersistenceModel.IgnoreBase(typeof(EntityWithTypedId<>));
-                var sessionFactory = Fluently.Configure()
-                    .Database(MySQLConfiguration.Standard.ConnectionString(connectionString).ShowSql())
+                var sessionFactory = Fluently.Configure(cfg)
+                    .Database(MySQLConfiguration.Standard.ConnectionString(connectionString).ShowSql().Dialect<MySQL57SpatialDialect>())
                     .Mappings(m =>
                     {
                         m.AutoMappings.Add(autoPersistenceModel);
